@@ -1,1 +1,1 @@
-# geojson2coco
+# geojson_to_coco
