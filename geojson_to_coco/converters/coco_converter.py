@@ -4,6 +4,7 @@ import os
 from PIL import Image
 import numpy as np
 
+
 def convert_geojson_to_coco_simple(image_dir, geojson_input_dir, coco_output_path, categories):
     coco_data = {
         "images": [],
@@ -18,7 +19,7 @@ def convert_geojson_to_coco_simple(image_dir, geojson_input_dir, coco_output_pat
     for geojson_filename in os.listdir(geojson_input_dir):
         if geojson_filename.endswith('.geojson'):
             # Infer image filename by replacing the GeoJSON extension with the image extension
-            image_filename = geojson_filename.replace('.geojson', '.png')
+            image_filename = geojson_filename.replace('.geojson', '.tiff')
             
             geojson_path = os.path.join(geojson_input_dir, geojson_filename)
             with open(geojson_path) as f:

@@ -1,5 +1,8 @@
 test_data/
 .vscode/
+dataset/
+images_only/
+panopticapi/
 
 # Byte-compiled / optimized / DLL files
 __pycache__/
