@@ -245,16 +245,17 @@ if __name__ == "__main__":
         {"id": 7, "name": "cell_plasma_cell", "supercategory": "Cell"},
         {"id": 8, "name": "cell_tumor", "supercategory": "Cell"},
         {"id": 9, "name": "cell_epithelium", "supercategory": "Cell"},
-        {"id": 10, "name": "cell_neutrophil", "supercategory": "Cell"}
+        {"id": 10, "name": "cell_neutrophil", "supercategory": "Cell"},
+        {"id": 11, "name": "cell_necrosis", "supercategory": "Cell"},
     ]
 
     tissue_categories = [
-        {"id": 11, "name": "tissue_blood_vessel", "supercategory": "Tissue"},
-        {"id": 12, "name": "tissue_stroma", "supercategory": "Tissue"},
-        {"id": 13, "name": "tissue_tumor", "supercategory": "Tissue"},
-        {"id": 14, "name": "tissue_epidermis", "supercategory": "Tissue"},
-        {"id": 15, "name": "tissue_white_background", "supercategory": "Tissue"},
-        {"id": 16, "name": "tissue_necrosis", "supercategory": "Tissue"}
+        {"id": 12, "name": "tissue_blood_vessel", "supercategory": "Tissue"},
+        {"id": 13, "name": "tissue_stroma", "supercategory": "Tissue"},
+        {"id": 14, "name": "tissue_tumor", "supercategory": "Tissue"},
+        {"id": 15, "name": "tissue_epidermis", "supercategory": "Tissue"},
+        {"id": 16, "name": "tissue_white_background", "supercategory": "Tissue"},
+        {"id": 17, "name": "tissue_necrosis", "supercategory": "Tissue"}
     ]
 
     convert_geojson_to_coco(dataset_dir, coco_output_path, cell_categories, tissue_categories)

@@ -9,10 +9,11 @@
   {"id": 8, "name": "cell_tumor", "supercategory": "Cell", "isthing": 1, "color": [45, 137, 94]},
   {"id": 9, "name": "cell_epithelium", "supercategory": "Cell", "isthing": 1, "color": [128, 1, 101]},
   {"id": 10, "name": "cell_neutrophil", "supercategory": "Cell", "isthing": 1, "color": [249, 119, 2]},
-  {"id": 11, "name": "tissue_blood_vessel", "supercategory": "Tissue", "isthing": 0, "color": [255, 167, 0]},
-  {"id": 12, "name": "tissue_stroma", "supercategory": "Tissue", "isthing": 0, "color": [0, 255, 0]},
-  {"id": 13, "name": "tissue_tumor", "supercategory": "Tissue", "isthing": 0, "color": [0, 0, 255]},
-  {"id": 14, "name": "tissue_epidermis", "supercategory": "Tissue", "isthing": 0, "color": [255, 0, 0]},
-  {"id": 15, "name": "tissue_white_background", "supercategory": "Tissue", "isthing": 0, "color": [255, 255, 255]},
-  {"id": 16, "name": "tissue_necrosis", "supercategory": "Tissue", "isthing": 0, "color": [0, 0, 0]}
+  {"id": 11, "name": "cell_necrosis", "supercategory": "Cell", "isthing": 1, "color": [249, 119, 2]},
+  {"id": 12, "name": "tissue_blood_vessel", "supercategory": "Tissue", "isthing": 0, "color": [255, 167, 0]},
+  {"id": 13, "name": "tissue_stroma", "supercategory": "Tissue", "isthing": 0, "color": [0, 255, 0]},
+  {"id": 14, "name": "tissue_tumor", "supercategory": "Tissue", "isthing": 0, "color": [0, 0, 255]},
+  {"id": 15, "name": "tissue_epidermis", "supercategory": "Tissue", "isthing": 0, "color": [255, 0, 0]},
+  {"id": 16, "name": "tissue_white_background", "supercategory": "Tissue", "isthing": 0, "color": [255, 255, 255]},
+  {"id": 17, "name": "tissue_necrosis", "supercategory": "Tissue", "isthing": 0, "color": [0, 0, 0]}
 ]
