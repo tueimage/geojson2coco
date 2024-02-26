@@ -2,7 +2,6 @@ test_data/
 .vscode/
 dataset/
 images_only/
-panopticapi/
 .idea/
 
 # Byte-compiled / optimized / DLL files

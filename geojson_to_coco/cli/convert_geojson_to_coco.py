@@ -35,7 +35,7 @@ def process_image(image_id, image_path, cell_geojson_path, tissue_geojson_path, 
         img_grayscale = img.convert('L')
         img_array = np.array(img_grayscale)
         coco_data['images'].append({
-            "id": image_id,
+            "id": int(image_id),
             "width": width,
             "height": height,
             "file_name": os.path.basename(image_path)
@@ -48,7 +48,7 @@ def process_image(image_id, image_path, cell_geojson_path, tissue_geojson_path, 
     tissue_centers = np.zeros((1024, 1024), dtype=np.uint16)  # pixel of tissue center = annotation ID
     annotation_to_mask = {}
     pixel_to_annotation = {}
-    overlaps_map = np.zeros((1024, 1024), dtype=np.uint32)
+    overlaps_map = np.zeros((1024, 1024), dtype=np.uint16)
 
     # iterate over all features of an image
     for feature in tqdm((cell_geojson_data['features'] + tissue_geojson_data['features'])):
@@ -120,11 +120,11 @@ def process_image(image_id, image_path, cell_geojson_path, tissue_geojson_path, 
 
         coco_data['annotations'].append({
             "id": annotation_id,
-            "image_id": image_id,
+            "image_id": int(image_id),
             "category_id": category_id,
             "segmentation": RLE,
-            "area": 0,  # int(mask.sum()),  # Area calculation based on mask
-            "bbox": [0, 0, 1024, 1024],  # maskUtils.toBbox(mask_encoded),  # Bounding box calculation based on mask
+            "area": int(mask.sum()),  # Area calculation based on mask
+            "bbox": [int(x) for x in list(maskUtils.toBbox(mask_encoded))],  # Bounding box calculation based on mask
             "iscrowd": 0
         })
         annotation_id += 1
@@ -219,7 +219,7 @@ def convert_geojson_to_coco(dataset_dir, coco_output_path, cell_categories, tiss
     # iterate over all images
     for cell_geojson_path, tissue_geojson_path, image_path in tqdm(
             zip(cell_geojson_paths, tissue_geojson_paths, image_paths), desc=f"Processing {len(image_paths)} images"):
-        if image_id > 3:
+        if image_id > 1:
             break  # TEMPORARY, PROCESS 3 IMAGES ONLY
         annotation_id = process_image(image_id, image_path, cell_geojson_path, tissue_geojson_path, coco_data, cell_category_name_to_id,
                       tissue_category_name_to_id, annotation_id)
