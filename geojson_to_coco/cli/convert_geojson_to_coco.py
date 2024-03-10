@@ -220,7 +220,7 @@ def convert_geojson_to_coco(dataset_dir, coco_output_path, cell_categories, tiss
             zip(cell_geojson_paths, tissue_geojson_paths, image_paths), desc=f"Processing {len(image_paths)} images"):
             annotation_id = process_image(image_id, image_path, cell_geojson_path, tissue_geojson_path, coco_data, cell_category_name_to_id,
                             tissue_category_name_to_id, annotation_id)
-        image_id += 1
+            image_id += 1
 
     # save to JSON file
     with open(coco_output_path, 'w') as f:
