@@ -3,6 +3,7 @@ test_data/
 dataset/
 images_only/
 .idea/
+output/
 
 # Byte-compiled / optimized / DLL files
 __pycache__/

@@ -44,8 +44,8 @@ def process_image(image_id, image_path, cell_geojson_path, tissue_geojson_path, 
     cell_ids = []
     cell_mask_img = Image.new('1', (width, height))  # stores all cell masks combined
     tissue_mask_img = Image.new('1', (width, height))  # stores all tissue masks combined
-    cell_centers = np.zeros((1024, 1024), dtype=np.uint16)  # pixel of cell center = annotation ID
-    tissue_centers = np.zeros((1024, 1024), dtype=np.uint16)  # pixel of tissue center = annotation ID
+    cell_centers = np.zeros((1024, 1024), dtype=np.uint32)  # pixel of cell center = annotation ID
+    tissue_centers = np.zeros((1024, 1024), dtype=np.uint32)  # pixel of tissue center = annotation ID
     annotation_to_mask = {}
     pixel_to_annotation = {}
     overlaps_map = np.zeros((1024, 1024), dtype=np.uint16)
@@ -91,11 +91,11 @@ def process_image(image_id, image_path, cell_geojson_path, tissue_geojson_path, 
         if is_cell:  # add mask to global cell mask, get center of cell
             cell_mask_img = ImageChops.logical_or(mask_img, cell_mask_img)
             center_y, center_x = find_center(np.array(mask_img))
-            cell_centers[center_y, center_x] = np.uint16(annotation_id)
+            cell_centers[center_y, center_x] = np.uint32(annotation_id)
         elif is_tissue:
             tissue_mask_img = ImageChops.logical_or(mask_img, tissue_mask_img)
             center_y, center_x = find_center(np.array(mask_img))
-            tissue_centers[center_y, center_x] = np.uint16(annotation_id)
+            tissue_centers[center_y, center_x] = np.uint32(annotation_id)
 
             # subtract cell mask from tissue mask
             mask_img = ImageChops.logical_and(mask_img, ImageChops.invert(cell_mask_img))
@@ -153,7 +153,6 @@ def process_image(image_id, image_path, cell_geojson_path, tissue_geojson_path, 
         if duplicate_annotation:
             continue
 
-        # for each overlap, construct new cell/tissue masks
         overlap_mask = np.logical_and.reduce([annotation_to_mask[segment_id] for segment_id in overlap_group])
 
         for segment_id in overlap_group:
@@ -168,12 +167,12 @@ def process_image(image_id, image_path, cell_geojson_path, tissue_geojson_path, 
 
             # the new mask is the pruned mask + the pixels assigned during watershedding
             new_mask = np.logical_or(pruned_mask, segmented_mask)
-            annotation_to_mask[segment_id] = new_mask
 
             if not np.any(new_mask):
-                print("Empty mask: " + str(segment_id))
+                raise ValueError(f"Empty mask in image {str(image_id)}: {str(segment_id)}")
 
             # update the segment's RLE
+            annotation_to_mask[segment_id] = new_mask
             mask_encoded = maskUtils.encode(np.asfortranarray(new_mask))
             coco_data['annotations'][segment_id - 1]['segmentation'] = {
                 "counts": mask_encoded["counts"].decode('utf-8'),
@@ -219,10 +218,8 @@ def convert_geojson_to_coco(dataset_dir, coco_output_path, cell_categories, tiss
     # iterate over all images
     for cell_geojson_path, tissue_geojson_path, image_path in tqdm(
             zip(cell_geojson_paths, tissue_geojson_paths, image_paths), desc=f"Processing {len(image_paths)} images"):
-        if image_id > 1:
-            break  # TEMPORARY, PROCESS 3 IMAGES ONLY
-        annotation_id = process_image(image_id, image_path, cell_geojson_path, tissue_geojson_path, coco_data, cell_category_name_to_id,
-                      tissue_category_name_to_id, annotation_id)
+            annotation_id = process_image(image_id, image_path, cell_geojson_path, tissue_geojson_path, coco_data, cell_category_name_to_id,
+                            tissue_category_name_to_id, annotation_id)
         image_id += 1
 
     # save to JSON file
@@ -234,32 +231,27 @@ if __name__ == "__main__":
     script_dir = os.path.dirname(os.path.realpath(__file__))  # current directory of this script
     dataset_dir = os.path.join(script_dir, "..", "..", "dataset")
     coco_output_path = os.path.join(script_dir, "..", "..", "output/coco_format_RLE.json")
+    categories_path = os.path.join(script_dir, "..", "..", "output/panoptic_coco_categories.json")
+    cell_categories = []
+    tissue_categories = []
 
-    cell_categories = [
-        {"id": 1, "name": "cell_lymphocyte", "supercategory": "Cell"},
-        {"id": 2, "name": "cell_macrophage", "supercategory": "Cell"},
-        {"id": 3, "name": "cell_stroma", "supercategory": "Cell"},
-        {"id": 4, "name": "cell_melanophage", "supercategory": "Cell"},
-        {"id": 5, "name": "cell_other", "supercategory": "Cell"},
-        {"id": 6, "name": "cell_endothelium", "supercategory": "Cell"},
-        {"id": 7, "name": "cell_plasma_cell", "supercategory": "Cell"},
-        {"id": 8, "name": "cell_tumor", "supercategory": "Cell"},
-        {"id": 9, "name": "cell_epithelium", "supercategory": "Cell"},
-        {"id": 10, "name": "cell_neutrophil", "supercategory": "Cell"},
-        {"id": 11, "name": "cell_necrosis", "supercategory": "Cell"},
-    ]
+    with open(categories_path, 'r') as f:
+        categories = json.load(f)
 
-    tissue_categories = [
-        {"id": 12, "name": "tissue_blood_vessel", "supercategory": "Tissue"},
-        {"id": 13, "name": "tissue_stroma", "supercategory": "Tissue"},
-        {"id": 14, "name": "tissue_tumor", "supercategory": "Tissue"},
-        {"id": 15, "name": "tissue_epidermis", "supercategory": "Tissue"},
-        {"id": 16, "name": "tissue_white_background", "supercategory": "Tissue"},
-        {"id": 17, "name": "tissue_necrosis", "supercategory": "Tissue"}
-    ]
+    for item in categories:
+        category = {
+            "id": item["id"],
+            "name": item["name"],
+            "supercategory": item["supercategory"]
+        }
+        if item["supercategory"] == "Cell":
+            cell_categories.append(category)
+        elif item["supercategory"] == "Tissue":
+            tissue_categories.append(category)
 
     convert_geojson_to_coco(dataset_dir, coco_output_path, cell_categories, tissue_categories)
     print("Done")
+
 
     '''
     Run the command below (at top-level of this GitHub repo) to convert from a COCO JSON file to panoptic COCO.
