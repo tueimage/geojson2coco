@@ -1,9 +1,13 @@
+train/input/
 test_data/
 .vscode/
 dataset/
 images_only/
+images_only_tiff/
+images_only_png/
 .idea/
 output/
+venv/
 
 # Byte-compiled / optimized / DLL files
 __pycache__/
