@@ -1,8 +1,8 @@
 import json
 import os
-
 import cv2
-from pycocotools.mask import decode
+import numpy as np
+import pycocotools.mask as mask_util
 
 categories_json = 'geojson_to_coco/output/categories.json'
 with open(categories_json, "r") as categories_json_file:
@@ -39,15 +39,26 @@ def draw_predictions(image_path, predictions, ground_truth):
         bbox = prediction['bbox']
         x, y, w, h = map(int, bbox)
         cv2.rectangle(image, (x, y), (x + w, y + h), (0, 0, 150), 1)
-        mask = decode(prediction['segmentation'])
-        mask = mask.astype(bool)
 
-        # create overlay/adjust transparency
+        # Decode the RLE for predicted segmentation mask
+        mask = mask_util.decode(prediction['segmentation'])
+        mask = mask.astype(bool)
+        coords = np.argwhere(mask)
+        if len(coords) == 0:
+            continue  # empty prediction
+        pred_centroid = coords.mean(axis=0)
+        pred_centroid2 = [bbox[0] + bbox[2] / 2, bbox[1] + bbox[3] / 2]
+        cv2.circle(image, (int(pred_centroid[1]), int(pred_centroid[0])), 3, (0, 0, 255), -1)
+        # cv2.circle(image, (int(pred_centroid2[1]), int(pred_centroid2[0])), 3, (255, 0, 0), -1)
+
+        # Create an overlay for the mask with a color
         overlay = image.copy()
         overlay[mask] = category_colors[prediction['category_id']]
+
+        # Apply the overlay. cv2.addWeighted is used to give the overlay some transparency
         image = cv2.addWeighted(src1=overlay, alpha=0.5, src2=image, beta=0.5, gamma=0)
 
-        # add text
+        # Add class name above the bounding box
         class_name = category_names[prediction['category_id']]
         text_size = cv2.getTextSize(class_name, font, font_scale, font_thickness)[0]
         text_x = x + int((w - text_size[0]) / 2)
@@ -59,7 +70,14 @@ def draw_predictions(image_path, predictions, ground_truth):
         x, y, w, h = map(int, bbox)
         cv2.rectangle(image, (x, y), (x + w, y + h), (0, 150, 0), 1)
 
-        # add text
+        mask = mask_util.decode(annotation['segmentation'])
+        mask = mask.astype(bool)
+        coords = np.argwhere(mask)
+        gt_centroid = coords.mean(axis=0)
+        cv2.circle(image, (int(gt_centroid[1]), int(gt_centroid[0])), 3, (0, 255, 0), -1)
+
+
+        # Add class name above the bounding box for ground truth
         class_name = category_names[annotation['category_id']]
         text_size = cv2.getTextSize(class_name, font, font_scale, font_thickness)[0]
         text_x = x + int((w - text_size[0]) / 2)
@@ -70,7 +88,7 @@ def draw_predictions(image_path, predictions, ground_truth):
 
 
 for filename in os.listdir(img_dir):
-    if filename.endswith('101.png'):  # change to visualize different images
+    if filename.endswith('101.png'):  # change accordingly
         image_path = os.path.join(img_dir, filename)
         image_name = os.path.splitext(filename)[0]
         image_number = int(image_name[6:9])

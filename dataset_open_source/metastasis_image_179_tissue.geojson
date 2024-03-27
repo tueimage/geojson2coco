@@ -1,0 +1,47 @@
+{
+    "type": "FeatureCollection",
+    "features": [
+        {
+            "type": "Feature",
+            "id": "d1a84238-5140-4851-af2f-85f20cd60517",
+            "geometry": {
+                "type": "Polygon",
+                "coordinates": [
+                    [
+                        [
+                            0,
+                            0
+                        ],
+                        [
+                            1024,
+                            0
+                        ],
+                        [
+                            1024,
+                            1024
+                        ],
+                        [
+                            0,
+                            1024
+                        ],
+                        [
+                            0,
+                            0
+                        ]
+                    ]
+                ]
+            },
+            "properties": {
+                "objectType": "annotation",
+                "classification": {
+                    "name": "tissue_tumor",
+                    "color": [
+                        200,
+                        0,
+                        0
+                    ]
+                }
+            }
+        }
+    ]
+}

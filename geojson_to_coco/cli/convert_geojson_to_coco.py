@@ -101,6 +101,9 @@ def process_image(image_id, image_path, cell_geojson_path, tissue_geojson_path, 
             mask_img = ImageChops.logical_and(mask_img, ImageChops.invert(cell_mask_img))
 
         mask = np.array(mask_img)
+        if not np.any(mask):
+            raise ValueError(f"Empty annotation in image {str(image_id)}: {str(annotation_id)}")
+
         overlaps_map += mask
 
         # update the annotations per pixel
@@ -169,7 +172,7 @@ def process_image(image_id, image_path, cell_geojson_path, tissue_geojson_path, 
             new_mask = np.logical_or(pruned_mask, segmented_mask)
 
             if not np.any(new_mask):
-                raise ValueError(f"Empty mask in image {str(image_id)}: {str(segment_id)}")
+                raise ValueError(f"Annotation within annotation in image {str(image_id)}: {str(segment_id)}")
 
             # update the segment's RLE
             annotation_to_mask[segment_id] = new_mask
@@ -203,10 +206,10 @@ def convert_geojson_to_coco(dataset_dir, coco_output_path, cell_categories, tiss
 
     # iterate over all files in the dataset
     for filename in os.listdir(dataset_dir):
-        if filename.endswith(".tiff") and not filename.endswith("_context.tiff"):
+        if filename.endswith(".png"):
             image_filename = os.path.join(dataset_dir, filename)
-            cell_filename = filename.replace(".tiff", "_cell.geojson")
-            tissue_filename = filename.replace(".tiff", "_tissue.geojson")
+            cell_filename = filename.replace(".png", "_cell.geojson")
+            tissue_filename = filename.replace(".png", "_tissue.geojson")
 
             # check if the corresponding _cell and _tissue GeoJSONs exist, and if not, skip the image
             # can be removed because dataset is now complete (150, 150, 150)
@@ -219,21 +222,21 @@ def convert_geojson_to_coco(dataset_dir, coco_output_path, cell_categories, tiss
     for cell_geojson_path, tissue_geojson_path, image_path in tqdm(
             zip(cell_geojson_paths, tissue_geojson_paths, image_paths), desc=f"Processing {len(image_paths)} images"):
 
-        if image_id == 1:
+        if image_id > 61:
             annotation_id = process_image(image_id, image_path, cell_geojson_path, tissue_geojson_path, coco_data, cell_category_name_to_id,
                             tissue_category_name_to_id, annotation_id)
         image_id += 1
 
     # save to JSON file
-    with open(coco_output_path, 'w') as f:
-        json.dump(coco_data, f, indent=4)
+    # with open(coco_output_path, 'w') as f:
+    #     json.dump(coco_data, f, indent=4)
 
 
 if __name__ == "__main__":
     script_dir = os.path.dirname(os.path.realpath(__file__))  # current directory of this script
-    dataset_dir = os.path.join(script_dir, "..", "..", "dataset")
-    coco_output_path = os.path.join(script_dir, "..", "..", "output/coco_format_RLE_1.json")
-    categories_path = os.path.join(script_dir, "..", "..", "output/panoptic_coco_categories.json")
+    dataset_dir = os.path.join(script_dir, "..", "..", "dataset_open_source")
+    coco_output_path = os.path.join(script_dir, "..", "..", "output/coco_open_source_156.json")
+    categories_path = os.path.join(script_dir, "..", "..", "output/categories.json")
     cell_categories = []
     tissue_categories = []
 

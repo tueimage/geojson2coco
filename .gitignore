@@ -2,9 +2,7 @@ train/input/
 test_data/
 .vscode/
 dataset/
-images_only/
-images_only_tiff/
-images_only_png/
+dataset_open_source/
 .idea/
 output/
 venv/
