@@ -69,7 +69,7 @@ class MyTrainer(DefaultTrainer):
         return build_detection_train_loader(cfg)
 
 
-wandb.login(key='a3e4f0230bd4bfac99da84a8b2f365acb93b592e')
+wandb.login(key='')
 wandb.init(project="PanopticFPN", name="panoptic_dice_precision_recall_f1")
 
 output_dir = 'geojson_to_coco/output'
