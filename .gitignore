@@ -3,6 +3,7 @@ test_data/
 .vscode/
 dataset/
 dataset_open_source/
+detectron2/
 .idea/
 output/
 venv/

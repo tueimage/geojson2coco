@@ -1,1 +1,1 @@
-# geojson2coco
+Put the panoptic_evaluation.py file in the folder "detectron2\detectron2\evaluation" and replace the current file
